@@ -108,66 +108,78 @@ export default function DashboardPage() {
       <Sidebar />
       <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
       <h1 className="text-2xl font-bold mb-4 text-[#264847]">Attendance Dashboard</h1>
-       <div className="flex flex-wrap items-center gap-4 mb-6">
-          {/* Period Select */}
-          <div>
-            <label className="text-sm text-gray-600 mr-2">Period:</label>
-            <select
-              value={period}
-              onChange={(e)=>setPeriod(e.target.value as Period)}
-              className="border rounded px-2 py-1"
-            >
-              {periods.map(p=> (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Department Filter */}
-          <div>
-            <label className="text-sm text-gray-600 mr-2">Department:</label>
-            <select
-              value={selectedDept}
-              onChange={(e)=>setSelectedDept(e.target.value)}
-              className="border rounded px-2 py-1"
-            >
-              {deptOptions.map(d=> (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Shift Filter */}
-          <div>
-            <label className="text-sm text-gray-600 mr-2">Shift:</label>
-            <select
-              value={selectedShift}
-              onChange={(e)=>setSelectedShift(e.target.value)}
-              className="border rounded px-2 py-1"
-            >
-              {shiftOptions.map(s=> (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-
-          {period === 'custom' && (
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={customStart}
-                onChange={(e) => setCustomStart(e.target.value)}
-                className="border px-2 py-1"
-              />
-              <span>to</span>
-              <input
-                type="date"
-                value={customEnd}
-                onChange={(e) => setCustomEnd(e.target.value)}
-                className="border px-2 py-1"
-              />
+       <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Period Select */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Period</label>
+              <div className="relative">
+                <select
+                  value={period}
+                  onChange={(e)=>setPeriod(e.target.value as Period)}
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#65b12a] focus:border-[#65b12a] sm:text-sm rounded-lg border"
+                >
+                  {periods.map(p=> (
+                    <option key={p} value={p} className="capitalize">{p}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
+
+            {/* Department Filter */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+              <div className="relative">
+                <select
+                  value={selectedDept}
+                  onChange={(e)=>setSelectedDept(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#65b12a] focus:border-[#65b12a] sm:text-sm rounded-lg border"
+                >
+                  {deptOptions.map(d=> (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Shift Filter */}
+            <div className="flex-1 min-w-[180px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Shift</label>
+              <div className="relative">
+                <select
+                  value={selectedShift}
+                  onChange={(e)=>setSelectedShift(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#65b12a] focus:border-[#65b12a] sm:text-sm rounded-lg border"
+                >
+                  {shiftOptions.map(s=> (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Custom Date Range */}
+            {period === 'custom' && (
+              <div className="flex-1 min-w-[400px]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={customStart}
+                    onChange={(e) => setCustomStart(e.target.value)}
+                    className="block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#65b12a] focus:border-[#65b12a] sm:text-sm rounded-lg border"
+                  />
+                  <span className="text-gray-500">to</span>
+                  <input
+                    type="date"
+                    value={customEnd}
+                    onChange={(e) => setCustomEnd(e.target.value)}
+                    className="block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#65b12a] focus:border-[#65b12a] sm:text-sm rounded-lg border"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       {isLoading ? (
         <div className="flex justify-center p-8">
