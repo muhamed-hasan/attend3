@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 import { AttendanceTable } from '@/components/attendance-table'
 import Sidebar from '@/components/Sidebar'
 import StatCard from '@/components/StatCard'
-import { AttendanceTrendChart, DepartmentAttendanceChart, ShiftWiseAttendance, TimeInOutChart } from '@/components/AttendanceCharts'
 
 // Define the expected API response type
 interface ApiResponse {
@@ -208,13 +207,7 @@ export default function DashboardPage() {
             </div>
           )}
           
-          {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <AttendanceTrendChart />
-            <DepartmentAttendanceChart />
-            <ShiftWiseAttendance />
-            <TimeInOutChart />
-          </div>
+
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <AttendanceTable records={displayedRecords} />
