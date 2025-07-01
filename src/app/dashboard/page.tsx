@@ -103,17 +103,21 @@ export default function DashboardPage() {
   // Filtered records
   const displayedRecords = records.filter(r => (selectedDept === 'All' || r.department === selectedDept) && (selectedShift === 'All' || (r.shift || 'None') === selectedShift))
 
-  // Calculate overall stats
-  const totalEmployees = stats?.totalEmployees || 0;
-  const presentCount = records.filter(r => r.rname !== null).length;
+  // Calculate unique employees
+  const uniqueEmployeeIds = Array.from(new Set(records.map(r => r.employee_id)));
+  const totalEmployees = uniqueEmployeeIds.length;
+  const presentEmployeeIds = Array.from(new Set(records.filter(r => r.rname !== null).map(r => r.employee_id)));
+  const presentCount = presentEmployeeIds.length;
   const absentCount = totalEmployees - presentCount;
   const attendanceRate = totalEmployees > 0 ? (presentCount / totalEmployees) * 100 : 0;
 
   // Department-wise stats (first two departments for demo)
   const departmentStats = departmentLabels.slice(0, 2).map(dept => {
     const deptRecords = records.filter(r => r.department === dept);
-    const deptTotal = deptRecords.length;
-    const deptPresent = deptRecords.filter(r => r.rname !== null).length;
+    const deptEmployeeIds = Array.from(new Set(deptRecords.map(r => r.employee_id)));
+    const deptTotal = deptEmployeeIds.length;
+    const deptPresentIds = Array.from(new Set(deptRecords.filter(r => r.rname !== null).map(r => r.employee_id)));
+    const deptPresent = deptPresentIds.length;
     const deptAbsent = deptTotal - deptPresent;
     const deptRate = deptTotal > 0 ? (deptPresent / deptTotal) * 100 : 0;
     return {
