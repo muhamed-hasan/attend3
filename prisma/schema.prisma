@@ -1,66 +1,42 @@
-@@ -1,42 +1,37 @@
--// This is your Prisma schema file,
--// learn more about it in the docs: https://pris.ly/d/prisma-schema
--
- generator client {
-   provider = "prisma-client-js"
- }
- 
- datasource db {
-   provider = "postgresql"
--  url      = env("DATABASE_URL")
-+  url      = "postgresql://postgres:123456@localhost:5433/data1"
- }
- 
-+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
- model Attendance {
--  id           String    @id @map("id")
--  time         DateTime  @map("time")
--  date         DateTime  @map("date")
--  time2        DateTime  @map("time2")
--  fname        String    @map("fname")
--  lname        String    @map("lname")
--  name         String    @map("name")
--  rname        String    @map("rname")
--  group        String    @map("group")
--  card_number  String    @map("card_number")
--  pic          String?   @map("pic")
--  dev          String    @map("dev")
--  
--  employee     Employee  @relation(fields: [id], references: [id])
--  
-+  id          String   @map("id") @db.VarChar
-+  time        DateTime @map("time") @db.Timestamp(6)
-+  date        DateTime @map("date") @db.Date
-+  time2       DateTime @map("time2") @db.Time(6)
-+  fname       String?  @map("fname") @db.VarChar
-+  lname       String?  @map("lname") @db.VarChar
-+  name        String?  @map("name") @db.VarChar
-+  rname       String?  @map("rname") @db.VarChar
-+  group       String?  @map("group") @db.VarChar
-+  card_number String?  @map("card_number") @db.VarChar
-+  pic         String?  @map("pic") @db.VarChar
-+  dev         String?  @map("dev") @db.VarChar
-+
-   @@map("table3")
-+  @@ignore
- }
- 
- model Employee {
--  id          Int       @id @map("id")
--  first_name  String    @map("first_name")
--  last_name   String    @map("last_name")
--  department  String    @map("department")
--  shift       String?   @map("shift")
--  
--  attendances Attendance[]
--  
-+  id         Int     @id @map("id")
-+  first_name String  @map("first_name") @db.VarChar(100)
-+  last_name  String  @map("last_name") @db.VarChar(100)
-+  department String  @map("department") @db.VarChar(100)
-+  shift      String? @map("shift") @db.VarChar(50)
-+
-   @@map("details")
- }
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:123456@localhost:5433/data1"
+}
+
+model Attendance {
+  id           String    @id @map("id")
+  time         DateTime  @map("time")
+  date         DateTime  @map("date")
+  time2        DateTime  @map("time2")
+  fname        String    @map("fname")
+  lname        String    @map("lname")
+  name         String    @map("name")
+  rname        String    @map("rname")
+  group        String    @map("group")
+  card_number  String    @map("card_number")
+  pic          String?   @map("pic")
+  dev          String    @map("dev")
+  
+  employee     Employee  @relation(fields: [id], references: [id])
+  
+  @@map("table3")
+}
+
+model Employee {
+  id          String       @id @map("id")
+  first_name  String    @map("first_name")
+  last_name   String    @map("last_name")
+  department  String    @map("department")
+  shift       String?   @map("shift")
+  
+  attendances Attendance[]
+  
+  @@map("details")
+}
