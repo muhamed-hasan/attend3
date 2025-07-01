@@ -1,5 +1,5 @@
 'use client';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 
 // Register ChartJS components
@@ -212,6 +212,45 @@ export function TimeInOutChart() {
           },
         },
       }} />
+    </div>
+  );
+}
+
+export function DepartmentDonutChart({ present, absent, department }: { present: number, absent: number, department: string }) {
+  const data = {
+    labels: ['Present', 'Absent'],
+    datasets: [
+      {
+        data: [present, absent],
+        backgroundColor: ['#65b12a', '#f87171'],
+        borderWidth: 2,
+      },
+    ],
+  };
+  const options = {
+    cutout: '70%',
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom' as const,
+        labels: {
+          boxWidth: 12,
+          padding: 10,
+          usePointStyle: true,
+        },
+      },
+      tooltip: {
+        enabled: true,
+      },
+    },
+  };
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <Doughnut data={data} options={options} style={{ maxWidth: 180, maxHeight: 180 }} />
+      <div className="flex gap-2 mt-2 text-xs">
+        <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full bg-[#65b12a]"></span>Present</span>
+        <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-full bg-[#f87171]"></span>Absent</span>
+      </div>
     </div>
   );
 }

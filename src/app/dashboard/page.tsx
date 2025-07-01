@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { AttendanceTable } from '@/components/attendance-table'
 import Sidebar from '@/components/Sidebar'
 import StatCard from '@/components/StatCard'
+import { DepartmentDonutChart } from '@/components/AttendanceCharts'
 
 // Define the expected API response type
 interface ApiResponse {
@@ -102,11 +103,79 @@ export default function DashboardPage() {
   // Filtered records
   const displayedRecords = records.filter(r => (selectedDept === 'All' || r.department === selectedDept) && (selectedShift === 'All' || (r.shift || 'None') === selectedShift))
 
+  // Calculate overall stats
+  const totalEmployees = stats?.totalEmployees || 0;
+  const presentCount = records.filter(r => r.rname !== null).length;
+  const absentCount = totalEmployees - presentCount;
+  const attendanceRate = totalEmployees > 0 ? (presentCount / totalEmployees) * 100 : 0;
+
+  // Department-wise stats (first two departments for demo)
+  const departmentStats = departmentLabels.slice(0, 2).map(dept => {
+    const deptRecords = records.filter(r => r.department === dept);
+    const deptTotal = deptRecords.length;
+    const deptPresent = deptRecords.filter(r => r.rname !== null).length;
+    const deptAbsent = deptTotal - deptPresent;
+    const deptRate = deptTotal > 0 ? (deptPresent / deptTotal) * 100 : 0;
+    return {
+      name: dept,
+      total: deptTotal,
+      present: deptPresent,
+      absent: deptAbsent,
+      rate: deptRate,
+    };
+  });
+
   return (
     <div className="flex h-screen">
       <Sidebar />
       <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
       <h1 className="text-2xl font-bold mb-4 text-[#264847]">Attendance Dashboard</h1>
+      {/* Top stats cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+          <div className="text-gray-500 text-sm mb-1">Total Employees</div>
+          <div className="text-2xl font-bold">{totalEmployees}</div>
+        </div>
+        <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+          <div className="text-green-600 text-sm mb-1">Present</div>
+          <div className="text-2xl font-bold">{presentCount}</div>
+        </div>
+        <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+          <div className="text-red-600 text-sm mb-1">Absent</div>
+          <div className="text-2xl font-bold">{absentCount}</div>
+        </div>
+        <div className="bg-white p-4 rounded shadow flex flex-col items-center">
+          <div className="text-purple-600 text-sm mb-1">Attendance Rate</div>
+          <div className="text-2xl font-bold">{attendanceRate.toFixed(1)}%</div>
+        </div>
+      </div>
+      {/* Department donut cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {departmentStats.map((dept, idx) => (
+          <div key={dept.name} className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <div className="flex items-center mb-2">
+              <span className={`inline-block w-3 h-3 rounded-full mr-2 ${idx === 0 ? 'bg-blue-600' : 'bg-purple-600'}`}></span>
+              <span className="font-semibold text-lg">{dept.name} Department</span>
+            </div>
+            <div className="flex gap-8 mb-2">
+              <div className="flex flex-col items-center">
+                <div className="text-gray-500 text-xs">Total</div>
+                <div className="font-bold text-lg">{dept.total}</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="text-green-600 text-xs">Present</div>
+                <div className="font-bold text-lg">{dept.present}</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="text-red-600 text-xs">Absent</div>
+                <div className="font-bold text-lg">{dept.absent}</div>
+              </div>
+            </div>
+            <div className="text-blue-700 text-sm mb-2">Attendance Rate <span className="font-bold">{dept.rate.toFixed(1)}%</span></div>
+            <DepartmentDonutChart present={dept.present} absent={dept.absent} department={dept.name} />
+          </div>
+        ))}
+      </div>
        <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
           <div className="flex flex-wrap items-center gap-4">
             {/* Period Select */}
