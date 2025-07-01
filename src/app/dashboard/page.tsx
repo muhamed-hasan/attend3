@@ -2,14 +2,46 @@
 
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
-import { Attendance, Employee } from '@/types/attendance'
 import { AttendanceTable } from '@/components/attendance-table'
+
+// Define the expected API response type
+interface ApiResponse {
+  data: Array<{
+    id: string
+    time: string
+    employee_id: string
+    first_name: string
+    last_name: string
+    department: string
+    shift: string | null
+    rname: string | null
+  }>
+  stats: {
+    totalEmployees: number
+    totalCheckIns: number
+    totalDepartments: number
+  }
+  period: {
+    start: string
+    end: string
+    type: string
+  }
+}
 
 const periods = ['day', 'week', 'month', 'year', 'custom'] as const
 
 type Period = typeof periods[number]
 
-type AttendanceWithEmployee = Attendance & { employee: Employee }
+type AttendanceWithEmployee = {
+  id: string
+  time: string
+  employee_id: string
+  first_name: string
+  last_name: string
+  department: string
+  shift: string | null
+  rname: string | null
+}
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>('day')
@@ -17,20 +49,38 @@ export default function DashboardPage() {
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
 
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState<{totalEmployees: number, totalCheckIns: number, totalDepartments: number} | null>(null)
+
   useEffect(() => {
     const fetchRecords = async () => {
-      const params = new URLSearchParams({ period })
-      if (period === 'custom') {
-        if (!customStart || !customEnd) return
-        params.set('start', customStart)
-        params.set('end', customEnd)
+      setIsLoading(true)
+      setError(null)
+      try {
+        const params = new URLSearchParams({ period })
+        if (period === 'custom') {
+          if (!customStart || !customEnd) return
+          params.set('start', customStart)
+          params.set('end', customEnd)
+        }
+        const res = await fetch(`/api/attendance?${params.toString()}`)
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.statusText}`)
+        }
+        const data: ApiResponse = await res.json()
+        setRecords(data.data || [])
+        setStats(data.stats)
+      } catch (error) {
+        console.error('Error fetching records:', error)
+        setError(error instanceof Error ? error.message : 'Failed to fetch records')
+        setRecords([])
+      } finally {
+        setIsLoading(false)
       }
-      const res = await fetch(`/api/attendance?${params.toString()}`)
-      const json = (await res.json()) as AttendanceWithEmployee[]
-      setRecords(json)
     }
 
-    fetchRecords().catch(console.error)
+    fetchRecords()
   }, [period, customStart, customEnd])
 
   return (
@@ -64,9 +114,42 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-      <AttendanceTable records={records} />
-      {records.length === 0 && (
-        <p className="mt-4 text-gray-500">No attendance records for the selected period.</p>
+      {isLoading ? (
+        <div className="flex justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="p-4 bg-red-50 text-red-700 rounded">
+          Error: {error}
+        </div>
+      ) : (
+        <>
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Total Employees</h3>
+                <p className="text-2xl font-semibold">{stats.totalEmployees}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Total Check-ins</h3>
+                <p className="text-2xl font-semibold">{stats.totalCheckIns}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Departments</h3>
+                <p className="text-2xl font-semibold">{stats.totalDepartments}</p>
+              </div>
+            </div>
+          )}
+          
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <AttendanceTable records={records} />
+            {records.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                No attendance records found for the selected period.
+              </div>
+            )}
+          </div>
+        </>
       )}
     </main>
   )
