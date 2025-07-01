@@ -35,12 +35,12 @@ export function AttendanceTable({ records }: Props) {
           </tr>
         </thead>
         <tbody>
-          {records.map((record) => (
+          {records.map((record, i) => (
             <tr 
-              key={`${record.id}-${record.time}`} 
+              key={i}
               className="hover:bg-gray-50"
             >
-              <td className="py-2 px-3 border">{record.employee_id}</td>
+              <td className="py-2 px-3 border">{record.id}</td>
               <td className="py-2 px-3 border">{`${record.first_name} ${record.last_name}`}</td>
               <td className="py-2 px-3 border">{record.department}</td>
               <td className="py-2 px-3 border">{record.shift || '-'}</td>
