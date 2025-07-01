@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         a.pic,
         a.dev
       FROM table3 a
-      JOIN details e ON a.id = e.id
+      JOIN details e ON a.id = e.id::varchar
       WHERE a.time BETWEEN $1 AND $2
       ORDER BY a.time DESC`,
       [startDate, endDate]
