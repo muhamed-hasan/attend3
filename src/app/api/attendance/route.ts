@@ -5,13 +5,16 @@ import { getDateRange } from '@/lib/dateRange';
 // Define TypeScript interfaces for our data
 interface AttendanceRecord {
   id: string;
-  time: Date;
-  employee_id: string;
+  time: string;
   first_name: string;
   last_name: string;
   department: string;
   shift: string | null;
   rname: string | null;
+  group: string | null;
+  card_number: string | null;
+  pic: string | null;
+  dev: string | null;
 }
 
 interface EmployeeStats {
@@ -54,14 +57,17 @@ export async function GET(request: NextRequest) {
       `SELECT 
         a.id, 
         a.time, 
-        a.employee_id,
         e.first_name, 
         e.last_name, 
         e.department, 
         e.shift,
-        a.rname
+        a.rname,
+        a.group,
+        a.card_number,
+        a.pic,
+        a.dev
       FROM table3 a
-      JOIN details e ON a.employee_id = e.id
+      JOIN details e ON a.id = e.id
       WHERE a.time BETWEEN $1 AND $2
       ORDER BY a.time DESC`,
       [startDate, endDate]
@@ -79,9 +85,9 @@ export async function GET(request: NextRequest) {
       departments.add(record.department);
       
       // Track employee attendance
-      if (!employees.has(record.employee_id)) {
-        employees.set(record.employee_id, {
-          id: record.employee_id,
+      if (!employees.has(record.id)) {
+        employees.set(record.id, {
+          id: record.id,
           first_name: record.first_name,
           last_name: record.last_name,
           department: record.department,
@@ -90,7 +96,7 @@ export async function GET(request: NextRequest) {
         });
       }
       
-      const employee = employees.get(record.employee_id);
+      const employee = employees.get(record.id);
       if (employee) {
         employee.attendance_count++;
       }
