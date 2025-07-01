@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export function AttendanceTable() {
+export function AttendanceTable({ records }: { records?: any[] }) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedDateRange, setSelectedDateRange] = useState('30');
     const [selectedDepartment, setSelectedDepartment] = useState('All');

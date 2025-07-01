@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic';
-const AttendanceTable = dynamic(() => import('./AttendanceTableWithRecords').then(mod => mod.AttendanceTable), { ssr: false });
+const AttendanceTable = dynamic(() => import('@/components/attendance-table').then(mod => mod.AttendanceTable), { ssr: false });
 import Sidebar from '@/components/Sidebar'
 import StatCard from '@/components/StatCard'
 import { DepartmentDonutChart } from '@/components/AttendanceCharts'
