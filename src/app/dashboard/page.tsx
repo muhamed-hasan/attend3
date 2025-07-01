@@ -49,6 +49,8 @@ type AttendanceWithEmployee = {
 export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>('day')
   const [records, setRecords] = useState<AttendanceWithEmployee[]>([])
+  const [selectedDept, setSelectedDept] = useState<string>('All')
+  const [selectedShift, setSelectedShift] = useState<string>('All')
   const [customStart, setCustomStart] = useState('')
   const [customEnd, setCustomEnd] = useState('')
 
@@ -94,39 +96,79 @@ export default function DashboardPage() {
     (d) => records.filter((r) => r.department === d).length
   );
 
+  // Options for filters
+  const deptOptions = ['All', ...departmentLabels]
+  const shiftOptions = ['All', ...Array.from(records.reduce((set, r) => set.add(r.shift || 'None'), new Set<string>()))]
+
+  // Filtered records
+  const displayedRecords = records.filter(r => (selectedDept === 'All' || r.department === selectedDept) && (selectedShift === 'All' || (r.shift || 'None') === selectedShift))
+
   return (
     <div className="flex h-screen">
       <Sidebar />
       <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
       <h1 className="text-2xl font-bold mb-4 text-[#264847]">Attendance Dashboard</h1>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {periods.map((p) => (
-          <button
-            key={p}
-            className={`px-3 py-1 rounded border ${period === p ? 'bg-blue-600 text-white' : 'bg-white'}`}
-            onClick={() => setPeriod(p)}
-          >
-            {p}
-          </button>
-        ))}
-        {period === 'custom' && (
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={customStart}
-              onChange={(e) => setCustomStart(e.target.value)}
-              className="border px-2 py-1"
-            />
-            <span>to</span>
-            <input
-              type="date"
-              value={customEnd}
-              onChange={(e) => setCustomEnd(e.target.value)}
-              className="border px-2 py-1"
-            />
+       <div className="flex flex-wrap items-center gap-4 mb-6">
+          {/* Period Select */}
+          <div>
+            <label className="text-sm text-gray-600 mr-2">Period:</label>
+            <select
+              value={period}
+              onChange={(e)=>setPeriod(e.target.value as Period)}
+              className="border rounded px-2 py-1"
+            >
+              {periods.map(p=> (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
           </div>
-        )}
-      </div>
+
+          {/* Department Filter */}
+          <div>
+            <label className="text-sm text-gray-600 mr-2">Department:</label>
+            <select
+              value={selectedDept}
+              onChange={(e)=>setSelectedDept(e.target.value)}
+              className="border rounded px-2 py-1"
+            >
+              {deptOptions.map(d=> (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Shift Filter */}
+          <div>
+            <label className="text-sm text-gray-600 mr-2">Shift:</label>
+            <select
+              value={selectedShift}
+              onChange={(e)=>setSelectedShift(e.target.value)}
+              className="border rounded px-2 py-1"
+            >
+              {shiftOptions.map(s=> (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          {period === 'custom' && (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="border px-2 py-1"
+              />
+              <span>to</span>
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="border px-2 py-1"
+              />
+            </div>
+          )}
+        </div>
       {isLoading ? (
         <div className="flex justify-center p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -163,7 +205,7 @@ export default function DashboardPage() {
           )}
 
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <AttendanceTable records={records} />
+            <AttendanceTable records={displayedRecords} />
             {records.length === 0 && (
               <div className="p-8 text-center text-gray-500">
                 No attendance records found for the selected period.
