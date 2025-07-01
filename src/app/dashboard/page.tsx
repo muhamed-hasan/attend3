@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { AttendanceTable } from '@/components/attendance-table'
 import Sidebar from '@/components/Sidebar'
 import StatCard from '@/components/StatCard'
-import AttendanceDonutChart from '@/components/AttendanceDonutChart'
+import { AttendanceTrendChart, DepartmentAttendanceChart, ShiftWiseAttendance, TimeInOutChart } from '@/components/AttendanceCharts'
 
 // Define the expected API response type
 interface ApiResponse {
@@ -180,21 +180,30 @@ export default function DashboardPage() {
       ) : (
         <>
           {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white p-4 rounded shadow">
-                  <h3 className="text-sm font-medium text-gray-500">Total Employees</h3>
-                  <p className="text-2xl font-semibold">{stats.totalEmployees}</p>
-                </div>
-                <StatCard title="Total Employees" value={stats.totalEmployees} color="#264847" />
-                <StatCard title="Present" value={stats.totalCheckIns} color="#65b12a" />
-                <StatCard title="Absent" value={stats.totalEmployees - stats.totalCheckIns} color="#e63946" />
-                <div className="bg-white p-4 rounded shadow flex items-center justify-center col-span-2">
-                  <AttendanceDonutChart present={stats.totalCheckIns} absent={stats.totalEmployees - stats.totalCheckIns} />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Total Employees</h3>
+                <p className="text-2xl font-semibold">{stats.totalEmployees}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Total Check-ins</h3>
+                <p className="text-2xl font-semibold">{stats.totalCheckIns}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h3 className="text-sm font-medium text-gray-500">Departments</h3>
+                <p className="text-2xl font-semibold">{stats.totalDepartments}</p>
               </div>
             </div>
           )}
+          
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <AttendanceTrendChart />
+            <DepartmentAttendanceChart />
+            <ShiftWiseAttendance />
+            <TimeInOutChart />
+          </div>
+
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <AttendanceTable records={displayedRecords} />
             {records.length === 0 && (
