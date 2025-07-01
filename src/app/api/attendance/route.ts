@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     const employees = new Map<string, EmployeeStats>();
     const departments = new Set<string>();
+    const presentEmployeeIds = new Set<string>();
     
     attendanceData.forEach(record => {
       // Track departments
@@ -95,14 +96,18 @@ export async function GET(request: NextRequest) {
           attendance_count: 0
         });
       }
-      
       const employee = employees.get(record.id);
       if (employee) {
         employee.attendance_count++;
       }
+      // Track present employees (unique)
+      if (record.rname !== null) {
+        presentEmployeeIds.add(record.id);
+      }
     });
 
     const uniqueEmployees = Array.from(employees.values());
+    const presentCount = presentEmployeeIds.size;
     
     // Prepare response
     const response = {
@@ -111,6 +116,7 @@ export async function GET(request: NextRequest) {
         totalEmployees: uniqueEmployees.length,
         totalCheckIns: attendanceData.length,
         totalDepartments: departments.size,
+        presentCount,
       },
       period: {
         start: formatDate(startDate),

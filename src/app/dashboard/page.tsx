@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
-import { AttendanceTable } from '@/components/attendance-table'
+import dynamic from 'next/dynamic';
+const AttendanceTable = dynamic(() => import('./AttendanceTableWithRecords').then(mod => mod.AttendanceTable), { ssr: false });
 import Sidebar from '@/components/Sidebar'
 import StatCard from '@/components/StatCard'
 import { DepartmentDonutChart } from '@/components/AttendanceCharts'
@@ -23,6 +24,7 @@ interface ApiResponse {
     totalEmployees: number
     totalCheckIns: number
     totalDepartments: number
+    presentCount: number
   }
   period: {
     start: string
@@ -56,7 +58,7 @@ export default function DashboardPage() {
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [stats, setStats] = useState<{totalEmployees: number, totalCheckIns: number, totalDepartments: number} | null>(null)
+  const [stats, setStats] = useState<{totalEmployees: number, totalCheckIns: number, totalDepartments: number, presentCount: number} | null>(null)
 
   useEffect(() => {
     const fetchRecords = async () => {
@@ -103,11 +105,9 @@ export default function DashboardPage() {
   // Filtered records
   const displayedRecords = records.filter(r => (selectedDept === 'All' || r.department === selectedDept) && (selectedShift === 'All' || (r.shift || 'None') === selectedShift))
 
-  // Calculate unique employees
-  const uniqueEmployeeIds = Array.from(new Set(records.map(r => r.employee_id)));
-  const totalEmployees = uniqueEmployeeIds.length;
-  const presentEmployeeIds = Array.from(new Set(records.filter(r => r.rname !== null).map(r => r.employee_id)));
-  const presentCount = presentEmployeeIds.length;
+  // Use backend stats for present/absent/rate
+  const totalEmployees = stats?.totalEmployees || 0;
+  const presentCount = stats?.presentCount || 0;
   const absentCount = totalEmployees - presentCount;
   const attendanceRate = totalEmployees > 0 ? (presentCount / totalEmployees) * 100 : 0;
 
