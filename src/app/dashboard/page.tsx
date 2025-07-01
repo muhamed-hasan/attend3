@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { AttendanceTable } from '@/components/attendance-table'
+import Sidebar from '@/components/Sidebar'
+import StatCard from '@/components/StatCard'
+import AttendanceBarChart from '@/components/AttendanceBarChart'
 
 // Define the expected API response type
 interface ApiResponse {
@@ -83,9 +86,19 @@ export default function DashboardPage() {
     fetchRecords()
   }, [period, customStart, customEnd])
 
+  // Compute department attendance counts for bar chart
+  const departmentLabels = Array.from(
+    records.reduce((set, r) => set.add(r.department), new Set<string>())
+  );
+  const departmentCounts = departmentLabels.map(
+    (d) => records.filter((r) => r.department === d).length
+  );
+
   return (
-    <main className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Attendance Dashboard</h1>
+    <div className="flex h-screen">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+      <h1 className="text-2xl font-bold mb-4 text-[#264847]">Attendance Dashboard</h1>
       <div className="flex flex-wrap gap-2 mb-6">
         {periods.map((p) => (
           <button
@@ -125,7 +138,7 @@ export default function DashboardPage() {
       ) : (
         <>
           {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white p-4 rounded shadow">
                 <h3 className="text-sm font-medium text-gray-500">Total Employees</h3>
                 <p className="text-2xl font-semibold">{stats.totalEmployees}</p>
@@ -141,6 +154,14 @@ export default function DashboardPage() {
             </div>
           )}
           
+          {/* Bar Chart */}
+          {departmentLabels.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6 mb-6">
+              <h2 className="text-lg font-semibold mb-4 text-[#264847]">Attendance by Department</h2>
+              <AttendanceBarChart labels={departmentLabels} data={departmentCounts} />
+            </div>
+          )}
+
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <AttendanceTable records={records} />
             {records.length === 0 && (
@@ -152,5 +173,6 @@ export default function DashboardPage() {
         </>
       )}
     </main>
+    </div>
   )
 }
