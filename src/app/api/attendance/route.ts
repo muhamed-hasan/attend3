@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { prisma } from '@/lib/db'
-import { getDateRange } from '@/lib/dateRange'
+import { prisma } from '../../../../src/lib/db'
+import { getDateRange } from '../../../../src/lib/dateRange'
 import { 
   EmployeeWithAttendances, 
   AttendanceWithEmployee,
   Attendance
-} from '@/types/database'
+} from '../../../../src/types/database'
 
 type Period = 'day' | 'week' | 'month' | 'year' | 'custom'
 
